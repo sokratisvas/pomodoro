@@ -1,6 +1,7 @@
 # Simple Pomodoro timer that gets things done
 
 Stop procrastination by dividing your work into focused intervals.
+Info: https://en.wikipedia.org/wiki/Pomodoro_Technique .
 
 # Quick Start
 You can specify your own intervals by:
