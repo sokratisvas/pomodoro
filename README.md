@@ -1,4 +1,4 @@
-i# Simple Pomodoro timer that gets things done
+# Simple Pomodoro timer that gets things done
 
 Stop procrastination by dividing your work into focused intervals.
 
