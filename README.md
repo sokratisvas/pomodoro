@@ -1,4 +1,4 @@
-# Simple Pomodoro timer that gets things done
+i# Simple Pomodoro timer that gets things done
 
 Stop procrastination by dividing your work into focused intervals.
 
@@ -16,7 +16,19 @@ $ cargo run ses 4 w 25 s 5 l 15
 |   **Short Break**  |  **5 min** |
 |   **Long Break**   | **15 min** 
 
-Or choose the default values:
+Pick one of the default workflows:
+``` sh
+$ cargo run def
+```
+``` sh
+Workflow parameters not specified. Default workflows:
+1) 4 sessions of 45 work, 8 short, 20 long
+2) 4 sessions of 30 work, 5 short, 15 long
+3) 5 sessions of 25 work, 5 short, 15 long
+Pick a default workflow (1 - 3): 
+> _
+```
+Or choose a built-in workflow:
 ``` sh
 $ cargo run 
 ```

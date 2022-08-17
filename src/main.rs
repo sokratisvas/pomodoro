@@ -3,8 +3,16 @@ use std::io::stdin;
 use std::io::{self, Write};
 use std::process::Command;
 use std::thread::sleep;
-use std::time::{Duration};
+use std::time::Duration;
 extern crate colour;
+
+struct Workflow {
+    description: String,
+    sessions: u16,
+    work: u16,
+    short: u16,
+    long: u16,
+}
 
 fn cntdown(duration: u16) -> String {
     let hours: u16 = duration / 3600;
@@ -39,7 +47,7 @@ fn check_continue(arg: String) {
         .read_line(&mut command)
         .ok()
         .expect("Failed to read line");
-    
+
     while command.as_str() != "n\n" && command.as_str() != "y\n" && command.as_str() != "Y\n" {
         print!("> Do you want to start your {} [Y/n]?  ", arg);
         io::stdout().flush().unwrap();
@@ -109,21 +117,76 @@ fn run(sessions: u16, work: u16, short: u16, long: u16) {
 }
 
 fn main() {
-    // Default parameters
-    let mut sessions: u16 = 4;
-    let mut work: u16 = 45 * 60;
-    let mut short: u16 = 8 * 60;
-    let mut long: u16 = 20 * 60;
+    // Default workflows
+    let mut defaults: Vec<Workflow> = Vec::new();
+    defaults.push(Workflow {
+        description: "4 sessions of 45 work, 8 short, 20 long".to_string(),
+        sessions: 4,
+        work: 45 * 60,
+        short: 8 * 60,
+        long: 20 * 60,
+    });
+    defaults.push(Workflow {
+        description: "4 sessions of 30 work, 5 short, 15 long".to_string(),
+        sessions: 4,
+        work: 30 * 60,
+        short: 5 * 60,
+        long: 15 * 60,
+    });
+    defaults.push(Workflow {
+        description: "5 sessions of 25 work, 5 short, 15 long".to_string(),
+        sessions: 5,
+        work: 25 * 60,
+        short: 5 * 60,
+        long: 15 * 60,
+    });
 
-    // target ses 4 w 45 s 5 l 5
+    // Default parameters
+    let sessions: u16;
+    let work: u16;
+    let short: u16;
+    let long: u16;
+
     let args: Vec<String> = env::args().collect();
 
-    if args.len() == 9 {
-        sessions = args[2].to_string().parse::<u16>().unwrap(); 
-        work = 60 * args[4].to_string().parse::<u16>().unwrap();
-        short = 60 * args[6].to_string().parse::<u16>().unwrap();
-        long = 60 * args[8].to_string().parse::<u16>().unwrap();
+    match args.len() {
+        // target ses 4 w 45 s 5 l 5
+        9 => {
+            sessions = args[2].to_string().parse::<u16>().unwrap();
+            work = 60 * args[4].to_string().parse::<u16>().unwrap();
+            short = 60 * args[6].to_string().parse::<u16>().unwrap();
+            long = 60 * args[8].to_string().parse::<u16>().unwrap();
+        }
+        // target def
+        2 => {
+            println!("Workflow parameters not specified. Default workflows:");
+            for (pos, workflow) in defaults.iter().enumerate() {
+                println!("{0}) {1}", pos + 1, workflow.description);
+            }
+            println!("Pick a default workflow (1 - {}): ", defaults.len());
+            let mut chosen = String::new();
+            stdin()
+                .read_line(&mut chosen)
+                .ok()
+                .expect("Failed to choose a default workflow.");
+            let index = chosen.trim().parse::<usize>().unwrap() - 1;
+
+            sessions = defaults[index].sessions;
+            work = defaults[index].work;
+            short = defaults[index].short;
+            long = defaults[index].long;
+        }
+        // target
+        1 => {
+            sessions = 4;
+            work = 45 * 60;
+            short = 8 * 60;
+            long = 20 * 60;
+        }
+        _ => {
+            panic!("Something went wrong!");
+        }
     }
 
-    run(sessions, work, short, long); 
+    run(sessions, work, short, long);
 }
