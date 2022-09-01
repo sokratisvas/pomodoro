@@ -37,5 +37,3 @@ $ cargo run
 |  **Work Interval** | **45 min** |
 |   **Short Break**  |  **8 min** |
 |   **Long Break**   | **20 min** 
-
-[![HitCount](https://hits.dwyl.com/sokratisvas/https://githubcom/sokratisvas/pomodoro.svg?style=flat-square)](http://hits.dwyl.com/sokratisvas/https://githubcom/sokratisvas/pomodoro)
