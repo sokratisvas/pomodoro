@@ -5,6 +5,10 @@ Stop procrastination by dividing your work into focused intervals.
 Info: https://en.wikipedia.org/wiki/Pomodoro_Technique .
 
 # Quick Start
+```bash
+$ git clone https://github.com/sokratisvas/pomodoro
+$ cd pomodoro
+```
 You can specify your own intervals by:
 ``` sh
 $ cargo run ses 4 w 25 s 5 l 15
@@ -36,4 +40,4 @@ $ cargo run
 |:------------------:|:----------:|
 |  **Work Interval** | **45 min** |
 |   **Short Break**  |  **8 min** |
-|   **Long Break**   | **20 min** 
+|   **Long Break**   | **20 min**
