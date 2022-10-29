@@ -6,6 +6,8 @@ use std::thread::sleep;
 use std::time::Duration;
 extern crate colour;
 
+// TODO: Use clap for arg parsing
+
 struct Workflow {
     description: String,
     sessions: u16,
@@ -116,6 +118,14 @@ fn run(sessions: u16, work: u16, short: u16, long: u16) {
     }
 }
 
+fn show_help() {
+    println!("Usage:");
+    println!("  cargo run ses <#sessions> w <work> s <small break> l <long break>");
+    println!("  cargo run def");
+    println!("  cargo run");
+    std::process::exit(1);
+}
+
 fn main() {
     // Default workflows
     let mut defaults: Vec<Workflow> = Vec::new();
@@ -170,6 +180,10 @@ fn main() {
                 .ok()
                 .expect("Failed to choose a default workflow.");
             let index = chosen.trim().parse::<usize>().unwrap() - 1;
+
+            if index < 0 || index > defaults.len() {
+                show_help();
+            }
 
             sessions = defaults[index].sessions;
             work = defaults[index].work;
