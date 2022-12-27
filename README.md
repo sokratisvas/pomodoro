@@ -4,6 +4,13 @@ Stop procrastination by dividing your work into focused intervals.
 
 Info: https://en.wikipedia.org/wiki/Pomodoro_Technique .
 
+# Dependencies
+Make sure that you can run `notify-send` and `aplay` by installing the following packages:
+
+```bash
+$ sudo apt-get istall libnotify-bin notify-osd alsa-utils
+```
+
 # Quick Start
 ```bash
 $ git clone https://github.com/sokratisvas/pomodoro
