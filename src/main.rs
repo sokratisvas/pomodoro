@@ -38,7 +38,20 @@ fn start_timer(mut duration: u16) {
     sleep(Duration::from_secs(1));
     print!("\r{}   \n", cntdown(duration));
     io::stdout().flush().unwrap();
-    //println!();
+}
+
+fn notify(message: &str) -> std::process::Output {
+    Command::new("notify-send")
+        .arg(message)
+        .output()
+        .expect("failed to execute process")
+}
+
+fn play_sound(wave_file: &str) -> std::process::Output {
+    Command::new("aplay")
+        .arg(wave_file)
+        .output()
+        .expect("failed to notify")
 }
 
 fn check_continue(arg: String) {
@@ -60,17 +73,12 @@ fn check_continue(arg: String) {
     }
 
     println!();
+
     if command.as_str() == "n\n" {
         colour::blue_ln!("> Take some extra time:");
-        start_timer(4);
-        let _notify = Command::new("notify-send")
-            .arg("Extra time complete.")
-            .output()
-            .expect("failed to execute process");
-        let _bepp = Command::new("aplay")
-            .arg("beep.wav")
-            .output()
-            .expect("failed to notify");
+        start_timer(5 * 60);
+        notify("Extra time complete.");
+        play_sound("beep.wav");
         println!();
     }
 }
@@ -79,41 +87,23 @@ fn run(sessions: u16, work: u16, short: u16, long: u16) {
     for session in 1..=sessions {
         colour::green_ln!("> Session {}/{}:", session, sessions);
         start_timer(work);
-        let _notify = Command::new("notify-send")
-            .arg("Work session complete. Take a break.")
-            .output()
-            .expect("failed to execute process");
-        let _bepp = Command::new("aplay")
-            .arg("beep.wav")
-            .output()
-            .expect("failed to notify");
+        notify("Work session complete. Take a break.");
+        play_sound("beep.wav");
         println!();
         check_continue("break".to_string());
 
         if session != sessions {
             colour::yellow_ln!("> Take a short break:");
             start_timer(short);
-            let _notify = Command::new("notify-send")
-                .arg("Break complete. Time to work.")
-                .output()
-                .expect("failed to execute process");
-            let _bepp = Command::new("aplay")
-                .arg("beep.wav")
-                .output()
-                .expect("failed to notify");
+            notify("Break complete. Time to work.");
+            play_sound("beep.wav");
             println!();
             check_continue("work".to_string());
         } else {
             colour::cyan_ln!("> Take a long break:");
             start_timer(long);
-            let _notify = Command::new("notify-send")
-                .arg("Pomodoro complete! Nice work!")
-                .output()
-                .expect("failed to execute process");
-            let _bepp = Command::new("aplay")
-                .arg("beep.wav")
-                .output()
-                .expect("failed to notify");
+            notify("Pomodoro complete! Nice work!");
+            play_sound("beep.wav");
         }
     }
 }
@@ -168,28 +158,39 @@ fn main() {
             long = 60 * args[8].to_string().parse::<u16>().unwrap();
         }
         // target def
-        2 => {
-            println!("Workflow parameters not specified. Default workflows:");
-            for (pos, workflow) in defaults.iter().enumerate() {
-                println!("{0}) {1}", pos + 1, workflow.description);
-            }
-            println!("Pick a default workflow (1 - {}): ", defaults.len());
-            let mut chosen = String::new();
-            stdin()
-                .read_line(&mut chosen)
-                .ok()
-                .expect("Failed to choose a default workflow.");
-            let index = chosen.trim().parse::<usize>().unwrap() - 1;
+        2 => match args[1].as_str() {
+            "def" => {
+                println!("Workflow parameters not specified. Default workflows:");
+                for (pos, workflow) in defaults.iter().enumerate() {
+                    println!("{0}) {1}", pos + 1, workflow.description);
+                }
+                println!("Pick a default workflow (1 - {}): ", defaults.len());
+                let mut chosen = String::new();
+                stdin()
+                    .read_line(&mut chosen)
+                    .ok()
+                    .expect("Failed to choose a default workflow.");
+                let mut index = chosen.trim().parse::<usize>().unwrap_or_else(|error| {
+                    panic!("Problem reading a workflow (index < 0): {:?}", error);
+                });
 
-            if index < 0 || index > defaults.len() {
+                index -= 1;
+                if index < 0 || index >= defaults.len() {
+                    println!("Choose a workflow 1-3. You chose {}.", { index + 1 });
+                    show_help();
+                    std::process::exit(1);
+                }
+
+                sessions = defaults[index].sessions;
+                work = defaults[index].work;
+                short = defaults[index].short;
+                long = defaults[index].long;
+            }
+            "what" | _ => {
                 show_help();
+                std::process::exit(1);
             }
-
-            sessions = defaults[index].sessions;
-            work = defaults[index].work;
-            short = defaults[index].short;
-            long = defaults[index].long;
-        }
+        },
         // target
         1 => {
             sessions = 4;
